@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оплата токеном в сети TON</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+        h2 {
+            color: #007aff;
+        }
+        input {
+            padding: 10px;
+            width: 80%;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+        p {
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Проверка и оплата токеном в сети TON</h2>
+        <label for="tonAddress">Введите ваш TON-адрес:</label>
+        <input type="text" id="tonAddress" placeholder="TON адрес">
+        <button onclick="checkToken()">Проверить</button>
+        <p id="tokenResult"></p>
+        
+        <button onclick="payWithJetton()">Оплатить токеном</button>
+        <p id="paymentResult"></p>
+    </div>
+    
+    <script>
+        const JETTON_ADDRESS = "EQALTuVYPhjDNjYphAPWxpHKcRxKUWkbNfwO8kdFrANnaLtw"; // Адрес контракта вашего токена
+        const WALLET_ADDRESS = "UQCqSOiAzpm8t-YqUGC8vpj9g1pOy4oqkzFPsKsjvqn5lZYi"; // Ваш кошелек для приема платежей
+        
+        async function checkToken() {
+            const address = document.getElementById('tonAddress').value;
+            if (!address) {
+                alert('Введите TON-адрес');
+                return;
+            }
+            
+            try {
+                const response = await axios.get(`https://tonapi.io/v1/account/getJettonBalance?account=${address}&jetton=${JETTON_ADDRESS}`);
+                document.getElementById('tokenResult').innerText = `Баланс: ${response.data.balance / 1e9} ваших токенов`;
+            } catch (error) {
+                document.getElementById('tokenResult').innerText = 'Ошибка проверки токена';
+            }
+        }
+        
+        function payWithJetton() {
+            const tonPaymentUrl = `https://pay.tonhub.com/transfer/${WALLET_ADDRESS}?amount=1000000000&jetton=${JETTON_ADDRESS}`; // 1 ваш токен
+            window.open(tonPaymentUrl, '_blank');
+            document.getElementById('paymentResult').innerText = 'Ожидайте завершения оплаты...';
+        }
+    </script>
+</body>
+</html>
